@@ -2,7 +2,6 @@ package org.sh.controller;
 
 import org.sh.dao.DeletionException;
 import org.sh.dao.LocationDao;
-import org.sh.dao.LocationDaoImpl;
 import org.sh.dto.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +24,13 @@ public class LocationController {
         return locationDao.listLocations();
     }
 
+
+    //TODO
+    @GetMapping("/superhero/{superheroId}")
+    public List<Location> listSuperheroLocations(@PathVariable int superheroId) {
+        return locationDao.listSuperheroLocations(superheroId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Location> getLocation(@PathVariable int id) {
         Location location = locationDao.getLocation(id);
@@ -35,8 +41,8 @@ public class LocationController {
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
     public Location addLocation(@RequestBody Location location) {
+        System.out.println(location.getName());
         return locationDao.addLocation(location);
     }
 
