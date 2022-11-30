@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/superpower")
+@RequestMapping("api/organization")
 public class OrganizationController {
 
     private final OrganizationDao orgDao;

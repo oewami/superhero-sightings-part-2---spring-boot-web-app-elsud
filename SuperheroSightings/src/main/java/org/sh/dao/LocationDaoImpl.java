@@ -98,9 +98,17 @@ public class LocationDaoImpl implements LocationDao {
         return location;
     }
 
-    @Override
-    public List<Location> listLocations(int superheroId) {
-        return null;
+    public List<Location> listSuperheroLocations(int superheroId) {
+        final String SELECT_SUPERHERO_LOCATIONS = "SELECT * FROM sightings WHERE superheroId = ?;";
+        try {
+            List<Location> superlocations = jdbcTemplate.query(SELECT_SUPERHERO_LOCATIONS, new LocationMapper(), superheroId);
+            for(Location location : superlocations) {
+                System.out.println(location.getName());
+            }
+            return superlocations;
+        } catch (DataAccessException e) {
+            return null;
+        }
     }
 
     public static class LocationMapper implements RowMapper<Location> {

@@ -15,8 +15,6 @@ public interface LocationDao {
     public boolean deleteLocation(int locationId) throws DeletionException;
 
     public Location addLocation(Location location);
-
-    public List<Location> listLocations(int superheroId);
     
     public List<Location> listSuperheroLocations(int superheroId);
 
