@@ -17,4 +17,7 @@ public interface LocationDao {
     public Location addLocation(Location location);
 
     public List<Location> listLocations(int superheroId);
+    
+    public List<Location> listSuperheroLocations(int superheroId);
+
 }
