@@ -103,7 +103,7 @@ public class LocationDaoImpl implements LocationDao {
         return null;
     }
 
-    private final class LocationMapper implements RowMapper<Location> {
+    public static class LocationMapper implements RowMapper<Location> {
 
         @Override
         public Location mapRow(ResultSet resultSet, int i) throws SQLException {

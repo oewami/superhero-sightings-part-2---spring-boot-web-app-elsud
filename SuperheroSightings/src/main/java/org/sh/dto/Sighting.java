@@ -1,12 +1,24 @@
 package org.sh.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Sighting {
 
+    private int id;
     private Location location;
     private Superhero superhero;
-    private LocalDateTime date;
+    private LocalDate date;
+
+    public Sighting() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Location getLocation() {
         return location;
@@ -24,11 +36,11 @@ public class Sighting {
         this.superhero = superhero;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 }

@@ -12,7 +12,7 @@ public interface LocationDao {
 
     public boolean editLocation(Location location);
 
-    public boolean deleteLocation(int locationId);
+    public boolean deleteLocation(int locationId) throws DeletionException;
 
     public Location addLocation(Location location);
 

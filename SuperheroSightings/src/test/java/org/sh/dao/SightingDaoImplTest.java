@@ -1,4 +1,4 @@
-package org.sh.dao;
+/*package org.sh.dao;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -207,3 +207,4 @@ public class SightingDaoImplTest {
     }
 
 }
+*/

@@ -4,7 +4,6 @@ import org.sh.dto.Location;
 import org.sh.dto.Sighting;
 
 import org.sh.dto.Superhero;
-import org.sh.dto.Superpower;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
@@ -12,10 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -30,7 +28,10 @@ public class SightingDaoImpl implements SightingDao {
     //review select statements
     @Override
     public Sighting getSighting(int sightingId){
-        final String SELECT_SIGHTING = "SELECT * FROM sighting where id = ?;";
+        final String SELECT_SIGHTING = "SELECT * FROM sighting "
+                + "INNER JOIN superhero ON sighting.superheroId = superhero.id "
+                + "INNER JOIN location ON sighting.locationId = location.id "
+                + "WHERE sighting.id = ?;";
         try {
             return jdbcTemplate.queryForObject(
                     SELECT_SIGHTING, new SightingDaoImpl.SightingMapper(), sightingId
@@ -42,33 +43,30 @@ public class SightingDaoImpl implements SightingDao {
 
     @Override
     public List<Sighting> listSightings(){
-        final String SELECT_SIGHTINGS = "SELECT * FROM sightings;";
+        final String SELECT_SIGHTINGS = "SELECT * FROM sightings "
+                + "INNER JOIN superhero ON sighting.superheroId = superhero.id "
+                + "INNER JOIN location ON sighting.locationId = location.id;";
         return jdbcTemplate.query(SELECT_SIGHTINGS, new SightingDaoImpl.SightingMapper());
     }
 
     @Override
     public boolean editSighting(Sighting sighting) throws NotUniqueException {
 
-
-        final String UPDATE_SIGHTING = "UPDATE sighting SET superheroId = ?, locationId = ?, "
+        final String UPDATE_SIGHTING = "UPDATE sighting SET superheroId = ?, date = ?, locationId = ?, "
                 + "where id =  ?;";
         try {
             return jdbcTemplate.update(
-                    UPDATE_SIGHTING, sighting.getLocation(), sighting.getDate(),
-                    sighting.getLocation().getId(), sighting.getSuperhero().getId()) > 0;
+                    UPDATE_SIGHTING, sighting.getLocation().getId(),
+                    sighting.getDate(), sighting.getSuperhero().getId()) > 0;
         } catch (DataAccessException ex) {
-            throw new NotUniqueException("Superhero name should be unique");
+            throw new NotUniqueException("Sighting with these data already exists");
         }
     }
 
     @Override
     public boolean deleteSighting(int sightingId){
-        final String DELETE_ORGANIZATION_CONN = "DELETE FROM superheroOrganization WHERE superheroId = ?;";
-        jdbcTemplate.update(DELETE_ORGANIZATION_CONN, sightingId);
-        final String DELETE_SIGHTING = "DELETE FROM sighting WHERE superheroId = ?;";
-        jdbcTemplate.update(DELETE_SIGHTING, sightingId);
-        final String DELETE_HERO = "DELETE FROM superhero WHERE id = ?;";
-        return jdbcTemplate.update(DELETE_HERO, sightingId) > 0;
+        final String DELETE_SIGHTING = "DELETE FROM sighting WHERE id = ?;";
+        return jdbcTemplate.update(DELETE_SIGHTING, sightingId) > 0;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class SightingDaoImpl implements SightingDao {
                 );
                 statement.setInt(1, sighting.getLocation().getId());
                 statement.setInt(2, sighting.getSuperhero().getId());
-                statement.setDate(3, (Date) sighting.getDate());
+                statement.setTimestamp(3, Timestamp.valueOf(sighting.getDate().atStartOfDay()));
                 return statement;
             }, keyHolder);
         } catch (DataAccessException ex) {
@@ -94,14 +92,14 @@ public class SightingDaoImpl implements SightingDao {
     }
 
     @Override
-    public List<Sighting> listSightings(LocalDateTime date){
-        return jdbcTemplate.query("select * from sightings",
-                new SightingMapper());
+    public List<Sighting> listSightings(LocalDate date){
+        return jdbcTemplate.query("select * from sightings where date = ?;",
+                new SightingMapper(), date);
     }
 
     @Override
     public List<Sighting> listLastSightings(){
-        return jdbcTemplate.query("select * from sightings order by id desc limit 10",
+        return jdbcTemplate.query("select * from sightings order by date desc limit 10",
                 new SightingMapper());
     }
 
@@ -110,20 +108,21 @@ public class SightingDaoImpl implements SightingDao {
         @Override
         public Sighting mapRow(ResultSet resultSet, int i) throws SQLException {
             Location location = new Location();
-            Sighting sighting = new Sighting("name", "description", location.getId(), location.getName());
+            Sighting sighting = new Sighting();
             Superhero superhero = new Superhero();
 
             location.setId(resultSet.getInt("location.id"));
-            superhero.setId(resultSet.getInt("superhero.id"));
-            sighting.setDate(resultSet.getDate("sighting.date"));
-            /*
             location.setName(resultSet.getString("location.name"));
             location.setDescription(resultSet.getString("location.description"));
             location.setAddress(resultSet.getString("location.address"));
-            location.setLatitude(resultSet.getString("location.latitude"));
-            location.setLongitude(resultSet.getString("location.longitude"));
-             */
+            location.setLatitude(resultSet.getBigDecimal("location.latitude"));
+            location.setLongitude(resultSet.getBigDecimal("location.longitude"));
 
+            superhero.setId(resultSet.getInt("superhero.id"));
+            superhero.setName(resultSet.getString("superhero.name"));
+            superhero.setDescription(resultSet.getString("superhero.description"));
+
+            sighting.setDate(resultSet.getTimestamp("sighting.date").toLocalDateTime().toLocalDate());
             sighting.setLocation(location);
             sighting.setSuperhero(superhero);
             return sighting;

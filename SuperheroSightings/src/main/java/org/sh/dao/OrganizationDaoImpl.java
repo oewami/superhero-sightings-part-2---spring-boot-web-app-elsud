@@ -26,9 +26,11 @@ public class OrganizationDaoImpl implements OrganizationDao {
     public Organization getOrganization(int id) {
         final String SELECT_ORGANIZATION = "SELECT * FROM organization where id = ?;";
         try {
-            return jdbcTemplate.queryForObject(
+            Organization organization = jdbcTemplate.queryForObject(
                     SELECT_ORGANIZATION, new OrganizationDaoImpl.OrganizationMapper(), id
             );
+            organization.setMembers(getSuperheros(id));
+            return organization;
         } catch (DataAccessException ex) {
             return null;
         }
@@ -38,64 +40,88 @@ public class OrganizationDaoImpl implements OrganizationDao {
     @Override
     public List<Organization> listOrganizations() {
         final String SELECT_ORGANIZATIONS = "SELECT * FROM organization;";
-        return jdbcTemplate.query(SELECT_ORGANIZATIONS, new OrganizationDaoImpl.OrganizationMapper());
+        List<Organization> organizations =  jdbcTemplate.query(
+                SELECT_ORGANIZATIONS, new OrganizationDaoImpl.OrganizationMapper());
+        organizations.stream()
+                .forEach(org -> org.setMembers(getSuperheros(org.getId())));
+        return organizations;
     }
 
 
+    @Transactional
     @Override
-    public boolean editOrganization(Organization organization) throws NotUniqueException {
+    public boolean editOrganization(Organization organization) {
         final String UPDATE_ORGANIZATION = "UPDATE organization SET name = ?, description = ?, "
-                + "address = ? WHERE id = ?;";
-        try {
-            return jdbcTemplate.update(
-                    UPDATE_ORGANIZATION, organization.getName(), organization.getDescription(),
-                    organization.getAddress(), organization.getId()) > 0;
-        } catch (DataAccessException ex) {
-            throw new NotUniqueException("Organization name should be unique");
+                + "address = ?  WHERE id = ?;";
+        final String DELETE_SUPERHERO_ORGANIZATION = "DELETE FROM superheroOrganization "
+                + "WHERE organizationId = ?;";
+        final String INSERT_SUPERHERO_ORGANIZATION = "INSERT INTO superheroOrganization "
+                + "(organizationId, superheroId) VALUES (?,?);";
+        jdbcTemplate.update(DELETE_SUPERHERO_ORGANIZATION, organization.getId());
+        for (Superhero superhero : organization.getMembers()) {
+            jdbcTemplate.update(
+                    INSERT_SUPERHERO_ORGANIZATION,
+                    organization.getId(),
+                    superhero.getId());
         }
+        return jdbcTemplate.update(
+                UPDATE_ORGANIZATION, organization.getName(), organization.getDescription(),
+                organization.getAddress(), organization.getId()) > 0;
     }
 
 
     //review
+    @Transactional
     @Override
     public boolean deleteOrganization(int organizationId) {
-        final String DELETE_ORGANIZATION_CONN = "DELETE FROM superheroOrganization WHERE superheroId = ?;";
-        jdbcTemplate.update(DELETE_ORGANIZATION_CONN, organizationId);
-        final String DELETE_SIGHTING = "DELETE FROM sighting WHERE superheroId = ?;";
-        jdbcTemplate.update(DELETE_SIGHTING, organizationId);
-        final String DELETE_HERO = "DELETE FROM superhero WHERE id = ?;";
-        return jdbcTemplate.update(DELETE_HERO, organizationId) > 0;
+        final String DELETE_SUPERHERO_CONN = "DELETE FROM superheroOrganization WHERE organizationId = ?;";
+        jdbcTemplate.update(DELETE_SUPERHERO_CONN, organizationId);
+        final String DELETE_ORGANIZATION= "DELETE FROM organization WHERE id = ?;";
+        return jdbcTemplate.update(DELETE_ORGANIZATION, organizationId) > 0;
     }
 
 
+    @Transactional
     @Override
-    public Organization addOrganization(Organization organization) throws NotUniqueException {
+    public Organization addOrganization(Organization organization) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         final String INSERT_ORGANIZATION = "INSERT INTO organization "
                 + "(id, name, description, address) VALUES(?, ?, ?, ?);";
-        try {
-            jdbcTemplate.update((Connection conn) -> {
-                PreparedStatement statement = conn.prepareStatement(
-                        INSERT_ORGANIZATION, Statement.RETURN_GENERATED_KEYS
-                );
-                statement.setInt(1, organization.getId());
-                statement.setString(2, organization.getName());
-                statement.setString(3, organization.getDescription());
-                statement.setString(4, organization.getAddress());
-                return statement;
-            }, keyHolder);
-        } catch (DataAccessException ex) {
-            throw new NotUniqueException("Sighting name should be unique");
-        }
+        jdbcTemplate.update((Connection conn) -> {
+            PreparedStatement statement = conn.prepareStatement(
+                    INSERT_ORGANIZATION, Statement.RETURN_GENERATED_KEYS
+            );
+            statement.setInt(1, organization.getId());
+            statement.setString(2, organization.getName());
+            statement.setString(3, organization.getDescription());
+            statement.setString(4, organization.getAddress());
+            return statement;
+        }, keyHolder);
         organization.setId(keyHolder.getKey().intValue());
+        final String INSERT_SUPERHEROS_CONN = "INSERT INTO superheroOrganization "
+                + "(organizationId, superheroId) VALUES (?,?);";
+        for (Superhero superhero : organization.getMembers()) {
+            jdbcTemplate.update(INSERT_SUPERHEROS_CONN, organization.getId(), superhero.getId());
+        }
         return organization;
     }
 
 
     @Override
     public List<Organization> listOrganizations(int superheroId) {
-        return jdbcTemplate.query("select * from organization",
-                new OrganizationDaoImpl.OrganizationMapper());
+        final String SELECT_ORGANIZATIONS_FOR_SUPERHERO = "SELECT o.* FROM organization o "
+                + "INNER JOIN superheroOrganization ON superheroId = ?;";
+        return jdbcTemplate.query(SELECT_ORGANIZATIONS_FOR_SUPERHERO,
+                new OrganizationMapper());
+    }
+
+    private List<Superhero> getSuperheros(int organizationId) {
+        final String SELECT_MEMBERS = "SELECT superhero.id, superhero.name, "
+                + "superhero.description, superpower.id, superpower.name "
+                + "FROM superhero INNER JOIN superpower ON superhero.superpower = superpower.id "
+                + "INNER JOIN superheroOrganization so ON so.superheroId = superhero.id "
+                + "WHERE so.organizationId = ?;";
+        return jdbcTemplate.query(SELECT_MEMBERS, new SuperheroDaoDatabaseImpl.SuperheroMapper(), organizationId);
     }
 
 
@@ -105,11 +131,10 @@ public class OrganizationDaoImpl implements OrganizationDao {
         public Organization mapRow(ResultSet resultSet, int i) throws SQLException {
             Organization organization = new Organization();
 
-            organization.setId(resultSet.getInt("organization.id"));
-            organization.setName(resultSet.getString("superhero.name"));
-            organization.setDescription(resultSet.getString("sighting.description"));
-            organization.setAddress(resultSet.getString("sighting.address"));
-
+            organization.setId(resultSet.getInt("id"));
+            organization.setName(resultSet.getString("name"));
+            organization.setDescription(resultSet.getString("description"));
+            organization.setAddress(resultSet.getString("address"));
 
             return organization;
         }

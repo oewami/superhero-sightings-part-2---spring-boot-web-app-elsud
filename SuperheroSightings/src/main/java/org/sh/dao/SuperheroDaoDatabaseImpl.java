@@ -110,7 +110,7 @@ public class SuperheroDaoDatabaseImpl implements SuperheroDao {
         return jdbcTemplate.query(SELECT_MEMBERS, new SuperheroMapper(), organizationId);
     }
 
-    private final class SuperheroMapper implements RowMapper<Superhero> {
+    public static class SuperheroMapper implements RowMapper<Superhero> {
 
         @Override
         public Superhero mapRow(ResultSet resultSet, int i) throws SQLException {
