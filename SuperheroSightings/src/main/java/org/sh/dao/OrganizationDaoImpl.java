@@ -86,15 +86,14 @@ public class OrganizationDaoImpl implements OrganizationDao {
     public Organization addOrganization(Organization organization) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         final String INSERT_ORGANIZATION = "INSERT INTO organization "
-                + "(id, name, description, address) VALUES(?, ?, ?, ?);";
+                + "(name, description, address) VALUES(?, ?, ?);";
         jdbcTemplate.update((Connection conn) -> {
             PreparedStatement statement = conn.prepareStatement(
                     INSERT_ORGANIZATION, Statement.RETURN_GENERATED_KEYS
             );
-            statement.setInt(1, organization.getId());
-            statement.setString(2, organization.getName());
-            statement.setString(3, organization.getDescription());
-            statement.setString(4, organization.getAddress());
+            statement.setString(1, organization.getName());
+            statement.setString(2, organization.getDescription());
+            statement.setString(3, organization.getAddress());
             return statement;
         }, keyHolder);
         organization.setId(keyHolder.getKey().intValue());

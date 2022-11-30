@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -43,7 +44,7 @@ public class SightingDaoImpl implements SightingDao {
 
     @Override
     public List<Sighting> listSightings(){
-        final String SELECT_SIGHTINGS = "SELECT * FROM sightings "
+        final String SELECT_SIGHTINGS = "SELECT * FROM sighting "
                 + "INNER JOIN superhero ON sighting.superheroId = superhero.id "
                 + "INNER JOIN location ON sighting.locationId = location.id;";
         return jdbcTemplate.query(SELECT_SIGHTINGS, new SightingDaoImpl.SightingMapper());
@@ -52,12 +53,13 @@ public class SightingDaoImpl implements SightingDao {
     @Override
     public boolean editSighting(Sighting sighting) throws NotUniqueException {
 
-        final String UPDATE_SIGHTING = "UPDATE sighting SET superheroId = ?, date = ?, locationId = ?, "
+        final String UPDATE_SIGHTING = "UPDATE sighting SET superheroId = ?, date = ?, locationId = ? "
                 + "where id =  ?;";
         try {
             return jdbcTemplate.update(
-                    UPDATE_SIGHTING, sighting.getLocation().getId(),
-                    sighting.getDate(), sighting.getSuperhero().getId()) > 0;
+                    UPDATE_SIGHTING, sighting.getSuperhero().getId(),
+                    Timestamp.valueOf(sighting.getDate().atStartOfDay()),
+                    sighting.getLocation().getId(), sighting.getId()) > 0;
         } catch (DataAccessException ex) {
             throw new NotUniqueException("Sighting with these data already exists");
         }
@@ -93,13 +95,13 @@ public class SightingDaoImpl implements SightingDao {
 
     @Override
     public List<Sighting> listSightings(LocalDate date){
-        return jdbcTemplate.query("select * from sightings where date = ?;",
+        return jdbcTemplate.query("select * from sighting where date = ?;",
                 new SightingMapper(), date);
     }
 
     @Override
     public List<Sighting> listLastSightings(){
-        return jdbcTemplate.query("select * from sightings order by date desc limit 10",
+        return jdbcTemplate.query("select * from sighting order by date desc limit 10",
                 new SightingMapper());
     }
 
@@ -125,23 +127,9 @@ public class SightingDaoImpl implements SightingDao {
             sighting.setDate(resultSet.getTimestamp("sighting.date").toLocalDateTime().toLocalDate());
             sighting.setLocation(location);
             sighting.setSuperhero(superhero);
+            sighting.setId(resultSet.getInt("sighting.id"));
             return sighting;
         }
     }
-
-    /*
-    private final class SightingShortMapper implements RowMapper<Sighting> {
-
-        @Override
-        public Sighting mapRow(ResultSet resultSet, int i) throws SQLException {
-            Sighting sighting = new Sighting();
-            superhero.setId(resultSet.getInt("id"));
-            superhero.setName(resultSet.getString("name"));
-            superhero.setDescription(resultSet.getString("description"));
-            return sighting;
-        }
-    }
-
-     */
 
 }

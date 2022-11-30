@@ -99,7 +99,9 @@ public class LocationDaoImpl implements LocationDao {
     }
 
     public List<Location> listSuperheroLocations(int superheroId) {
-        final String SELECT_SUPERHERO_LOCATIONS = "SELECT * FROM sightings WHERE superheroId = ?;";
+        final String SELECT_SUPERHERO_LOCATIONS = "SELECT l.* FROM location l "
+                + "INNER JOIN sighting s ON l.id = s.locationId WHERE s.superheroId = ?;";
+
         try {
             List<Location> superlocations = jdbcTemplate.query(SELECT_SUPERHERO_LOCATIONS, new LocationMapper(), superheroId);
             for(Location location : superlocations) {
