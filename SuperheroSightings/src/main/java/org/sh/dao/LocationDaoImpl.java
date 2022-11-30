@@ -19,25 +19,11 @@ import java.util.Map;
 @Profile("prod")
 public class LocationDaoImpl implements LocationDao {
 
-    /**
-     * 	id INT AUTO_INCREMENT PRIMARY KEY,
-     * 	name VARCHAR(40) NOT NULL,
-     *     description VARCHAR(160),
-     *     address VARCHAR(80) NOT NULL,
-     *     longitude VARCHAR(10) NOT NULL,
-     *     latitude VARCHAR(10) NOT NULL,
-     *     CONSTRAINT UNIQUE (longitude, latitude)
-     */
     private Map<Integer, Location> locations = new HashMap<>();
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    /**
-     *
-     * @param locationId
-     * @return
-     */
     @Override
     public Location getLocation(int locationId) {
         final String SELECT_LOCATION = "SELECT * FROM location WHERE id = ?;";
@@ -99,8 +85,17 @@ public class LocationDaoImpl implements LocationDao {
     }
 
     @Override
-    public List<Location> listLocations(int superheroId) {
-        return null;
+    public List<Location> listSuperheroLocations(int superheroId) {
+        final String SELECT_SUPERHERO_LOCATIONS = "SELECT * FROM sightings WHERE superheroId = ?;";
+        try {
+            List<Location> superlocations = jdbcTemplate.query(SELECT_SUPERHERO_LOCATIONS, new LocationMapper(), superheroId);
+            for(Location location : superlocations) {
+                System.out.println(location.getName());
+            }
+            return superlocations;
+        } catch (DataAccessException e) {
+            return null;
+        }
     }
 
     private final class LocationMapper implements RowMapper<Location> {
