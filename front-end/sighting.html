@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Superhero Sightings</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <!-- Additional CSS files here -->
+
+  </head>
+  <body>
+    <div class="container">
+        <h1>Superhero Sighting</h1>
+        <div id="sightingDetailsTable">
+            <h2>Sighting Details</h2>
+            <table id="sightingDetailsTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th width="15%"></th>
+                        <th width="85%"></th>
+                    </tr>
+                </thead>
+                <!-- we will add data rows dynamically to the tbody -->
+                <tbody id="sightingRows"></tbody>
+            </table>
+            <div class="offset-md-3 col-md-3">
+                <button type="button"
+                        id="editSightingButton"
+                        class="btn btn-info"
+                        onclick="showEditForm()">
+                    Edit
+                </button>
+                <button type="button"
+                        id="deleteSightingButton"
+                        class="btn btn-danger"
+                        onclick="deleteSighting()">
+                    Delete
+                </button>
+            </div>
+        </div>
+
+        <div id="editFormDiv" style="display:none;">
+            <h2>Edit Sighting</h2>
+            <form class="form-horizontal" role="form" id="editForm">
+                
+                <div class="form-group row">
+                    <label for="editDate" class="col-md-4 control-label">
+                        Date:
+                    </label>
+        
+                    <div class="col-md-8">
+                        <input type="date" 
+                               class="form-control"
+                               id="editDate"
+                               placeholder="Date" 
+                               required>
+                    </div>
+                </div>
+                <div class="form-group row"> 
+                    <label for="editSuperhero" class="col-md-4 control-label">
+                        Superhero:
+                    </label>
+                    <select id="selectSuperheroEdit" class="select" required style="width:60%">
+                    </select>
+
+                </div>
+                <div class="form-group row"> 
+                    <label for="editLocation" class="col-md-4 control-label">
+                        Location:
+                    </label>
+                    <select id="selectLocationEdit" class="select" required style="width:60%">
+                    </select>
+                </div>
+
+                <div class="form-group row">
+                    <div class="offset-md-3 col-md-3">
+                        
+                        <button type="button"
+                                id="editCancelButton"
+                                class="btn btn-danger"
+                                onclick="hideEditForm()">
+                            Cancel
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="hidden" id="editSightingId">
+                        <button type="button"
+                                id="updateButton"
+                                class="btn btn-success">
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </form>
+    
+        </div>      
+    </div>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- use the the full jQuery build, NOT the slim build-->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <!-- JS & CSS library of MultiSelect plugin -->
+ 
+    <!-- custom js files -->
+    <script src="js/sighting.js"></script>
+
+    </body>
+</html>    

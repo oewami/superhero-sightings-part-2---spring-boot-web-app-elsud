@@ -7,8 +7,13 @@ import org.sh.dto.Superhero;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -70,6 +75,9 @@ public class SightingController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Sighting> addSighting(@RequestBody SightingFromRequest sighting) throws NotUniqueException {
+        if (sighting.getDate().isAfter(LocalDate.now())) {
+            throw new DateTimeException("Date cannot be in the future");
+        }
         Superhero superhero = superheroDao.getSuperhero(sighting.getSuperheroId());
         Location location = locationDao.getLocation(sighting.getLocationId());
         if (superhero == null || location == null) {
@@ -87,9 +95,6 @@ public class SightingController {
         private int locationId;
         private int superheroId;
         private LocalDate date;
-        private int day;
-        private int month;
-        private int year;
 
         public int getId() {
             return id;
@@ -116,32 +121,13 @@ public class SightingController {
         }
 
         public LocalDate getDate() {
-            return LocalDate.of(year, month, day);
+            return date;
         }
 
-        public int getDay() {
-            return day;
+        public void setDate(String date) {
+            this.date = LocalDate.parse(date);
         }
 
-        public void setDay(int day) {
-            this.day = day;
-        }
-
-        public int getMonth() {
-            return month;
-        }
-
-        public void setMonth(int month) {
-            this.month = month;
-        }
-
-        public int getYear() {
-            return year;
-        }
-
-        public void setYear(int year) {
-            this.year = year;
-        }
     }
 
 }

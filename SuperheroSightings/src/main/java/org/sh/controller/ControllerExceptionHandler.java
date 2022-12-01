@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.time.DateTimeException;
 
 @ControllerAdvice
 @RestController
@@ -19,6 +20,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
         return new ResponseEntity<>(
                 "Not valid due to validation error: " + ex.getMessage(),
+                HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(DateTimeException.class)
+    ResponseEntity<String> handleDateTimeException(DateTimeException ex) {
+        return new ResponseEntity<>(
+                "Not valid due to: " + ex.getMessage(),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
