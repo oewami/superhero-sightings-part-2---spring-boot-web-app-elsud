@@ -1,16 +1,20 @@
 $(document).ready(function () {
     loadLocations();
+    addLocation();
+    updateLocation();
 })
 
 function loadLocations() {
-    var contentRows = $('contentRows');
+    clearLocationTable();
+    var contentRows = $('#contentRows');
 
     $.ajax({
         type: 'GET',
-        url: 'api/location',
+        url: 'http://localhost:9090/api/location',
         success: function(locationArray) {
         console.log(locationArray);
             $.each(locationArray, function(index, location){
+                var locationId = location.id;
                 var name = location.name;
                 var description = location.description;
                 var address = location.address;
@@ -18,14 +22,14 @@ function loadLocations() {
                 var long = location.longitude;
                 var lat = location.latitude;
                 var row = '<tr>';
-                    row += '<td>' + location.id + '</td>'
+                    row += '<td>' + locationId + '</td>'
                     row += '<td>' + name + '</td>';
                     row += '<td>' + description + '</td>';
                     row += '<td>' + address + '</td>';
                     row += '<td>' + long + '</td>';
                     row += '<td>' + lat + '</td>';
-                    row += '<td><button type="button" class="btn btn-danger">Edit</button></td>'
-                    row += '</tr>'
+                    row += '<td><button type="button" class="btn btn-info" onclick="showEditForm(' + locationId + ')">Edit</button></td>';                    
+                    row += '<td><button type="button" class="btn btn-danger" onclick="deleteLocation(' + locationId + ')">Delete</button></td>';                    row += '</tr>';
 
                     contentRows.append(row);
 
@@ -43,51 +47,138 @@ function loadLocations() {
 
 }
 
-//File for use in Ajax lesson
-//var locationContainer = document.getElementById("locations-info");
-//var table = document.getElementById("locations-table");
-//
-//    var locationsRequest = new XMLHttpRequest();
-//    locationsRequest.open('GET', 'http://localhost:9090/api/location/');
-//    locationsRequest.onload = function() {
-//        var data = JSON.parse(locationsRequest.responseText);
-//        console.log(data);
-////        renderTable(data);
-//    };
-//    locationsRequest.send();
+function clearLocationTable() {
+    $('#contentRows').empty();
+}
+
+function addLocation() {
+    $('#addButton').click(function (event) {
+        $.ajax({
+           type: 'POST',
+           url: 'http://localhost:9090/api/location',
+           data: JSON.stringify({
+                name: $('#addName').val(),
+                description: $('#addDescription').val(),
+                address: $('#addAddress').val(),
+                longitude: $('#addLongitude').val(),
+                latitude: $('#addLatitude').val()
+           }),
+           headers: {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json'
+           },
+           'dataType': 'json',
+           success: function() {
+               $('#errorMessages').empty();
+               $('#addName').val(''),
+               $('#addDescription').val(''),
+               $('#addAddress').val(''),
+               $('#addLongitude').val(''),
+               $('#addLatitude').val('')
+               loadLocations();
+           },
+           error: function () {
+               $('#errorMessages')
+                .append($('<li>')
+                .attr({class: 'list-group-item list-group-item-danger'})
+                .text('Error calling web service. Please try again later.'));
+           }
+        })
+    });
+}
 
 
-//function renderTable(data) {
-//
-//    for (i = 0; i < data.length; i++) {
-//        var row = `<tr>
-//                        <td>${data[i].name}</td>
-//                        <td>${data[i].description}</td>
-//                        <td>${data[i].address}</td>
-//                        <td>${data[i].longitude}</td>
-//                        <td>${data[i].latitude}</td>
-//                        <td><button id=${data[i].id} class = "editBtn" onClick="editDataById(this.id)>Edit</button> | <button id = ${data[i].id} class = "delBtn">Delete</button></td>
-//                    </tr>`
-//        console.log(row);
-//        table.innerHTML += row;
-//    }
-//
-//}
-//
-//var editBtn = document.getElementsByClassName("editBtn");
-//var delBtn = document.getElementsByClassName("delBtn");
-//
-//function editDataById(id) {
-//    editBtn.addEventListener("click", function(id) {
-//        // var editRequest = new XMLHttpRequest();
-//        // editRequest.open('GET', 'http://localhost:9090/api/location/4')
-//        console.log(id);
-//    })
-//}
+function showEditForm(locationId) {
+    $('#errorMessages').empty();
+    
+    $.ajax({
+        type: 'GET',
+        url: 'http://localhost:9090/api/location/' + locationId,
+        success: function(data, status) {
+            $('#editLocationId').val(locationId),
+            $('#editName').val(data.name);
+            $('#editDescription').val(data.description),
+            $('#editAddress').val(data.address),
+            $('#editLongitude').val(data.longitude),
+            $('#editLatitude').val(data.latitude)
+            
+        },
+        error: function() {
+            $('#errorMessages')
+            .append($('<li>')
+            .attr({class: 'list-group-item list-group-item-danger'})
+            .text('Error calling web service. Please try again later.')); 
+        }
+    })
+    
+    $('#addFormDiv').hide();
+    $('#editFormDiv').show();
+}
 
+function hideEditForm() {
+    $('#errorMessages').empty();
+    $('#editName').val('');
+    $('#editDescription').val(),
+    $('#editAddress').val(),
+    $('#editLongitude').val(),
+    $('#editLatitude').val()
 
+    $('#addFormDiv').show();
+    $('#editFormDiv').hide();
+}
 
+function hideAddForm() {
+    $('#errorMessages').empty();
+    $('#addName').val('');
+    $('#addDescription').val(),
+    $('#addAddress').val(),
+    $('#addLongitude').val(),
+    $('#addLatitude').val()
 
+    $('#locationTableDiv').show();
+    $('#editFormDiv').show();
+}
 
+function updateLocation() {
+    $('#updateButton').click(function(event) {
+        $.ajax({
+            type: 'PUT',
+            url:  'http://localhost:9090/api/location/' + $('#editLocationId').val(),
+            data: JSON.stringify({
+                name: $('#editName').val(),
+                description: $('#editDescription').val(),
+                address: $('#editAddress').val(),
+                longitude: $('#editLongitude').val(),
+                latitude: $('#editLatitude').val()
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            'dataType': 'json',
+            'success': function() {
+                $('#errorMessage').empty();
+                clearLocationTable();
+                loadLocations();
+                hideEditForm();
 
+            },
+            'error': function() {
+                $('#errorMessages')
+                .append($('<li>')
+                .attr({class: 'list-group-item list-group-item-danger'})
+                .text('Error calling web service. Please try again later.')); 
+            }
+        })
+    })
+}
 
+function deleteLocation(locationId) {
+    $.ajax({
+        type: 'DELETE',
+        url: 'http://localhost:9090/api/location/' + locationId,
+        success: function() {
+            loadLocations();
+        }
+    });
+}
