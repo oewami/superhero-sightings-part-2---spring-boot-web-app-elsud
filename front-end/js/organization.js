@@ -11,7 +11,7 @@ function loadOrganization() {
     var organizationRows = $('#organizationRows');
     $.ajax({
         type: 'GET',
-        url: 'api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/organization/' + organizationId,
         success: function(data, status) {
             var row = '<tr>';
             row += '<td>name</td>';
@@ -48,7 +48,7 @@ function loadOrganizationSuperheros(organizationId) {
     var organizationRows = $('#organizationRows');
     $.ajax({
         type: 'GET',
-        url: 'api/superhero/forOrganization/' + organizationId,
+        url: 'http://localhost:9090/api/superhero/forOrganization/' + organizationId,
         success: function(superheroArray) {
             $.each(superheroArray, function(index, superhero){
                 organizationRows.append('<tr><td></td><td>' + superhero.name + '</td>');
@@ -70,7 +70,7 @@ function loadSuperheros() {
 
     $.ajax({
         type: 'GET',
-        url: 'api/superhero',
+        url: 'http://localhost:9090/api/superhero',
         success: function(superheroArray) {
             $.each(superheroArray, function(index, superhero){
                 var name = superhero.name;
@@ -100,7 +100,7 @@ function showEditForm() {
 
     $.ajax({
         type: 'GET',
-        url: 'api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/organization/' + organizationId,
         success: function(data, status) {
             $('#editName').val(data.name);
             $('#editDescription').val(data.description);
@@ -144,7 +144,7 @@ function updateOrganization(organizationId) {
         });
         $.ajax({
             type: 'PUT',
-            url: 'api/organization/' + $('#editOrganizationId').val(),
+            url: 'http://localhost:9090/api/organization/' + $('#editOrganizationId').val(),
             data: JSON.stringify({
                 organizationId: $('#editOrganizationId').val(),
                 name: $('#editName').val(),
@@ -176,7 +176,7 @@ function deleteOrganization() {
     var organizationId = GetParameterValue("id");
     $.ajax({
         type: 'DELETE',
-        url: 'api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/organization/' + organizationId,
         success: function() {
             window.location.href="organizations.html";
         }

@@ -12,7 +12,7 @@ function loadSighting() {
     var sightingRows = $('#sightingRows');
     $.ajax({
         type: 'GET',
-        url: 'api/sighting/' + sightingId,
+        url: 'http://localhost:9090/api/sighting/' + sightingId,
         success: function(data, status) {
             sightingRows.append('<tr><td>superhero</td><td>' + data.superhero.name + '</td>');
             sightingRows.append('<tr><td>location</td><td>' + data.location.name + '</td>');
@@ -45,7 +45,7 @@ function loadSuperheros() {
 
     $.ajax({
         type: 'GET',
-        url: 'api/superhero',
+        url: 'http://localhost:9090/api/superhero',
         success: function(superheroArray) {
             $.each(superheroArray, function(index, superhero){
                 var name = superhero.name;
@@ -69,7 +69,7 @@ function loadLocations() {
     var locationsEdit = $('#selectLocationEdit');
     $.ajax({
         type: 'GET',
-        url: 'api/location',
+        url: 'http://localhost:9090/api/location',
         success: function(locationArray) {
             $.each(locationArray, function(index, location){
                 var name = location.name;
@@ -97,7 +97,7 @@ function showEditForm() {
     $('#errorMessages').empty();
     $.ajax({
         type: 'GET',
-        url: 'api/sighting/' + sightingId,
+        url: 'http://localhost:9090/api/sighting/' + sightingId,
         success: function(data, status) {
             var date = data.date.split("-");
             $('#editDate').val(data.date);
@@ -139,7 +139,7 @@ function updateSighting() {
         var selectedLocation = $('#selectLocationEdit option:selected').val();
         $.ajax({
             type: 'PUT',
-            url: 'api/sighting/' + $('#editSightingId').val(),
+            url: 'http://localhost:9090/api/sighting/' + $('#editSightingId').val(),
             data: JSON.stringify({
                 date: $('#editDate').val(),
                 superheroId: selectedSuperhero,
@@ -169,7 +169,7 @@ function deleteSighting() {
     var sightingId = GetParameterValue("id");
     $.ajax({
         type: 'DELETE',
-        url: 'api/sighting/' + sightingId,
+        url: 'http://localhost:9090/api/sighting/' + sightingId,
         success: function() {
             window.location.href="sightings.html";
         }

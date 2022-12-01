@@ -12,7 +12,7 @@ function loadSuperheros() {
 
     $.ajax({
         type: 'GET',
-        url: 'api/superhero',
+        url: 'http://localhost:9090/api/superhero',
         success: function(superheroArray) {
             $.each(superheroArray, function(index, superhero){
                 var name = superhero.name;
@@ -38,7 +38,7 @@ function loadOrganizations() {
     
     $.ajax({
         type: 'GET',
-        url: 'api/organization',
+        url: 'http://localhost:9090/api/organization',
         success: function(organizationArray) {
             $.each(organizationArray, function(index, organization){
                 var name = organization.name;
@@ -71,7 +71,7 @@ function addOrganization() {
         });
         $.ajax({
            type: 'POST',
-           url: 'api/organization',
+           url: 'http://localhost:9090/api/organization',
            data: JSON.stringify({
                 name: $('#addName').val(),
                 description: $('#addDescription').val(),
@@ -110,7 +110,7 @@ function showEditForm(organizationId) {
 
     $.ajax({
         type: 'GET',
-        url: 'api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/organization/' + organizationId,
         success: function(data, status) {
             $('#editName').val(data.name);
             $('#editDescription').val(data.description);
@@ -154,7 +154,7 @@ function updateOrganization() {
         });
         $.ajax({
             type: 'PUT',
-            url: 'api/organization/' + $('#editOrganizationId').val(),
+            url: 'http://localhost:9090/api/organization/' + $('#editOrganizationId').val(),
             data: JSON.stringify({
                 //organizationId: $('#editOrganizationId').val(),
                 name: $('#editName').val(),
@@ -185,7 +185,7 @@ function updateOrganization() {
 function deleteOrganization(organizationId) {
     $.ajax({
         type: 'DELETE',
-        url: 'api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/organization/' + organizationId,
         success: function() {
             loadOrganizations();
         }
