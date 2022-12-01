@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/location")
 public class LocationController {
@@ -25,7 +26,6 @@ public class LocationController {
     }
 
 
-    //TODO
     @GetMapping("/superhero/{superheroId}")
     public List<Location> listSuperheroLocations(@PathVariable int superheroId) {
         return locationDao.listSuperheroLocations(superheroId);
