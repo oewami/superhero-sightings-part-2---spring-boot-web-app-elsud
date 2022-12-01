@@ -14,7 +14,7 @@ function loadSighting() {
         type: 'GET',
         url: 'http://localhost:9090/api/sighting/' + sightingId,
         success: function(data, status) {
-            sightingRows.append('<tr><td>superhero</td><td>' + data.superhero.name + '</td>');
+            sightingRows.append('<tr><td>superhero</td><td><a href="superhero.html?id=' + data.superhero.id +'">' + data.superhero.name + '</a></td>');
             sightingRows.append('<tr><td>location</td><td>' + data.location.name + '</td>');
             sightingRows.append('<tr><td>date</td><td>' + data.date + '</td>');
             sightingRows.append('<tr><td>latitude</td><td>' + data.location.latitude + '</td>');
@@ -103,6 +103,7 @@ function showEditForm() {
             $('#editDate').val(data.date);
             $('#editSuperhero').val(data.superhero.id);
             $('#editLocation').val(data.location.id);
+            $('#editSightingId').val(sightingId);
             
         },
         error: function() {
@@ -137,9 +138,10 @@ function updateSighting() {
         }
         var selectedSuperhero = $('#selectSuperheroEdit option:selected').val();
         var selectedLocation = $('#selectLocationEdit option:selected').val();
+        var sightingId = GetParameterValue("id");
         $.ajax({
             type: 'PUT',
-            url: 'http://localhost:9090/api/sighting/' + $('#editSightingId').val(),
+            url: 'http://localhost:9090/api/sighting/' + sightingId,
             data: JSON.stringify({
                 date: $('#editDate').val(),
                 superheroId: selectedSuperhero,

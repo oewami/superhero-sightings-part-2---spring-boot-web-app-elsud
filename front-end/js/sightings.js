@@ -146,6 +146,7 @@ function showEditForm(sightingId) {
             $('#editDate').val(data.date);
             $('#editSuperhero').val(data.superhero.id);
             $('#editLocation').val(data.location.id);
+            $('#editSightingId').val(sightingId);
             
         },
         error: function() {
@@ -181,11 +182,11 @@ function updateSighting() {
         var selectedLocation = $('#selectLocationEdit option:selected').val();
         $.ajax({
             type: 'PUT',
-            url: 'http://localhost:9090/api/sighting/' + $('#editSightingId').val(),
+            url: 'http://localhost:9090/api/sighting/' +  $('#editSightingId').val(),
             data: JSON.stringify({
                 date: $('#editDate').val(),
                 superheroId: selectedSuperhero,
-                locationId: selectedLocation
+                locationId: selectedLocation,
             }),
             headers: {
                 'Accept': 'application/json',

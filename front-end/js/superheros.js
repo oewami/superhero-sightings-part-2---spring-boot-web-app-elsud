@@ -1,25 +1,25 @@
 $(document).ready(function () {
+    loadSuperpowers();
     loadSuperheros();
-    loadOrganizations();
     
-    addOrganization();
-    updateOrganization();
+    addSuperhero();
+    updateSuperhero();
 });
 
-function loadSuperheros() {
-    var membersEdit = $('#selectMembersEdit');
-    var membersAdd = $('#selectMembersAdd');
+function loadSuperpowers() {
+    var superpowerEdit = $('#selectSuperpowerEdit');
+    var superpowerAdd = $('#selectSuperpowerAdd');
 
     $.ajax({
         type: 'GET',
-        url: 'http://localhost:9090/api/superhero',
-        success: function(superheroArray) {
-            $.each(superheroArray, function(index, superhero){
-                var name = superhero.name;
-                var superheroId = superhero.id;
-                var row = '<option value="' + superheroId + '">' + name + '</option>'
-                membersEdit.append(row);
-                membersAdd.append(row); 
+        url: 'http://localhost:9090/api/superpower',
+        success: function(superpowerArray) {
+            $.each(superpowerArray, function(index, superpower){
+                var name = superpower.name;
+                var superpowerId = superpower.id;
+                var row = '<option value="' + superpowerId + '">' + name + '</option>'
+                superpowerEdit.append(row);
+                superpowerAdd.append(row); 
             })
         
         },
@@ -32,20 +32,20 @@ function loadSuperheros() {
     }); 
 }
 
-function loadOrganizations() {
-    clearOrganizationTable();
+function loadSuperheros() {
+    clearSuperheroTable();
     var contentRows = $('#contentRows');
     
     $.ajax({
         type: 'GET',
-        url: 'http://localhost:9090/api/organization',
-        success: function(organizationArray) {
-            $.each(organizationArray, function(index, organization){
-                var name = organization.name;
-                var organizationId = organization.id;
-                var row = '<tr><td><a href="organization.html?id=' + organizationId +'">' + name + '</a></td>';
-                row += '<td><button type="button" class="btn btn-info" onclick="showEditForm(' + organizationId + ')">Edit</button></td>';
-                row += '<td><button type="button" class="btn btn-danger" onclick="deleteOrganization(' + organizationId + ')">Delete</button></td>';
+        url: 'http://localhost:9090/api/superhero',
+        success: function(superheroArray) {
+            $.each(superheroArray, function(index, superhero){
+                var name = superhero.name;
+                var superheroId = superhero.id;
+                var row = '<tr><td><a href="superhero.html?id=' + superheroId +'">' + name + '</a></td>';
+                row += '<td><button type="button" class="btn btn-info" onclick="showEditForm(' + superheroId + ')">Edit</button></td>';
+                row += '<td><button type="button" class="btn btn-danger" onclick="deleteSuperhero(' + superheroId + ')">Delete</button></td>';
                 row += '</tr>';
                 contentRows.append(row);
             })
@@ -59,24 +59,21 @@ function loadOrganizations() {
     }); 
 }
 
-function addOrganization() {
+function addSuperhero() {
     $('#addButton').click(function (event) {
         var haveValidationErrors = checkAndDisplayValidationErrors($('#addForm').find('input'));
         if(haveValidationErrors) {
             return false;
         }
-        var selectedMembers = [];
-        $.each($('#selectMembersAdd option:selected'), function(){
-            selectedMembers.push($(this).val());
-        });
+        var selectedSuperpower= $('#selectSuperpowerAdd option:selected').val();
+
         $.ajax({
            type: 'POST',
-           url: 'http://localhost:9090/api/organization',
+           url: 'http://localhost:9090/api/superhero',
            data: JSON.stringify({
                 name: $('#addName').val(),
                 description: $('#addDescription').val(),
-                address: $('#addAddress').val(),
-                members: selectedMembers
+                superpowerId: selectedSuperpower
            }),
            headers: {
                'Accept': 'application/json',
@@ -87,9 +84,8 @@ function addOrganization() {
                $('#errorMessages').empty();
                $('#addName').val('');
                $('#addDescription').val('');
-               $('#addAddress').val('');
-               $('#selectMembersAdd').val('');
-               loadOrganizations();
+               $('#selectSuperpowerAdd').val('');
+               loadSuperheros();
            },
            error: function () {
                $('#errorMessages')
@@ -101,21 +97,21 @@ function addOrganization() {
     });
 }
 
-function clearOrganizationTable() {
+function clearSuperheroTable() {
     $('#contentRows').empty();
 }
 
-function showEditForm(organizationId) {
+function showEditForm(superheroId) {
     $('#errorMessages').empty();
 
     $.ajax({
         type: 'GET',
-        url: 'http://localhost:9090/api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/superhero/' + superheroId,
         success: function(data, status) {
             $('#editName').val(data.name);
             $('#editDescription').val(data.description);
-            $('#editAddress').val(data.address);
-            $('#editOrganizationId').val(data.id);
+            $('#editSuperpower').val(data.superpower.id);
+            $('#editSuperheroId').val(data.id);
             
         },
         error: function() {
@@ -126,7 +122,7 @@ function showEditForm(organizationId) {
         }
     })
     
-    $('#organizationsTable').hide();
+    $('#superherosTable').hide();
     $('#editFormDiv').show();
 }
 
@@ -135,31 +131,27 @@ function hideEditForm() {
     
     $('#editName').val('');
     $('#editDescription').val('');
-    $('#editAddress').val('');
-    $('#selectMembersEdit').val('');
+    $('#selectSuperpowerEdit').val('');
 
-    $('#organizationsTable').show();
+    $('#superherosTable').show();
     $('#editFormDiv').hide();
 }
 
-function updateOrganization() {
+function updateSuperhero() {
     $('#updateButton').click(function(event) {
         var haveValidationErrors = checkAndDisplayValidationErrors($('#editForm').find('input'));
         if(haveValidationErrors) {
             return false;
         }
-        var selectedMembers = [];
-        $.each($('#selectMembersEdit option:selected'), function(){
-            selectedMembers.push($(this).val());
-        });
+        var selectedSuperpower = $('#selectSuperpowerEdit option:selected').val();
+
         $.ajax({
             type: 'PUT',
-            url: 'http://localhost:9090/api/organization/' + $('#editOrganizationId').val(),
+            url: 'http://localhost:9090/api/superhero/' + $('#editSuperheroId').val(),
             data: JSON.stringify({
                 name: $('#editName').val(),
                 description: $('#editDescription').val(),
-                address: $('#editAddress').val(),
-                members: selectedMembers
+                superpowerId: selectedSuperpower
             }),
             headers: {
                 'Accept': 'application/json',
@@ -169,7 +161,7 @@ function updateOrganization() {
             'success': function() {
                 $('#errorMessage').empty();
                 hideEditForm();
-                loadOrganizations();
+                loadSuperheros();
             },
             'error': function() {
                 $('#errorMessages')
@@ -181,12 +173,12 @@ function updateOrganization() {
     })
 }    
 
-function deleteOrganization(organizationId) {
+function deleteSuperhero(superheroId) {
     $.ajax({
         type: 'DELETE',
-        url: 'http://localhost:9090/api/organization/' + organizationId,
+        url: 'http://localhost:9090/api/superhero/' + superheroId,
         success: function() {
-            loadOrganizations();
+            loadSuperheros();
         }
     });
 }

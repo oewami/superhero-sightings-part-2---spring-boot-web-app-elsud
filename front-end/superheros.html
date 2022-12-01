@@ -17,7 +17,7 @@
     <div class="container">
         <div class="row m-4">
             <div class="col text-center border border-dark">
-                <h1>Superhero Sightings</h1>
+                <h1>Superheros</h1>
             </div>
         </div>
         <div class="row m-4 border border-dark">
@@ -46,15 +46,13 @@
         <div class="row">
             <!-- container for table -->
             <div class="col-md-6"> 
-                <div id="sightingsTable">
-                    <h2>Sightings</h2> 
-                    <table id="sightingsTable" class="table table-hover">
+                <div id="superherosTable">
+                    <h2>Superheros</h2> 
+                    <table id="superherosTable" class="table table-hover">
                         <thead>
                             <tr>
-                                <th width="10%">Id</th>
-                                <th width="20%">Superhero</th>
-                                <th width="20%">Location</th>
-                                <th width="20%">Date</th>
+                                <th width="30%">Name</th>
+                                <th width="30%">Superpower</th>
                                 <th width="15%"></th>
                                 <th width="15%"></th>
                             </tr>
@@ -64,39 +62,44 @@
                     </table>
                 </div>
                 <div id="editFormDiv" style="display:none;">
-                    <h2>Edit Sighting</h2>
-                
+                    <h2>Edit Superhero</h2>
+                    <form class="form-horizontal" role="form" id="editForm">
                         <div class="form-group row">
-                            <label for="editDate" class="col-md-4 control-label">
-                                Date:
+                            <label for="editName" class="col-md-4 control-label">
+                                Name:
                             </label>
                 
                             <div class="col-md-8">
-                                <input type="date" 
+                                <input type="text" 
                                        class="form-control"
-                                       id="editDate"
-                                       placeholder="Date" 
+                                       id="editName"
+                                       placeholder="Name" 
                                        required>
                             </div>
                         </div>
                         <div class="form-group row"> 
-                            <label for="editSuperhero" class="col-md-4 control-label">
-                                Superhero:
+                            <label for="editDescription" class="col-md-4 control-label">
+                                Description:
                             </label>
-                            <select id="selectSuperheroEdit" class="select" required style="width:60%">
-                            </select>
-
+                    
+                            <div class="col-md-8">
+                                <input type="text" 
+                                       class="form-control"
+                                       id="editDescription"
+                                       placeholder="Description">
+                            </div>
                         </div>
                         <div class="form-group row"> 
-                            <label for="editLocation" class="col-md-4 control-label">
-                                Location:
+                            <label for="editSuperpower" class="col-md-4 control-label">
+                                Superpower:
                             </label>
-                            <select id="selectLocationEdit" class="select" required style="width:60%">
+                            <select id="selectSuperpowerEdit" class="select" required style="width:60%">
                             </select>
                         </div>
 
                         <div class="form-group row">
                             <div class="offset-md-3 col-md-3">
+                                
                                 <button type="button"
                                         id="editCancelButton"
                                         class="btn btn-danger"
@@ -105,7 +108,7 @@
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                <input type="hidden" id="editSightingId">
+                                <input type="hidden" id="editSuperheroId">
                                 <button type="button"
                                         id="updateButton"
                                         class="btn btn-success">
@@ -115,54 +118,62 @@
                         </div>
                     </form>
             
-                </div>      
+                </div>              
             </div>
     
             <!-- container for form -->
              <div class="col-md-6"> 
-                <h2>Add New Sighting</h2>
-                <form class="form-horizontal" role="form" id="addForm">     
-                    
+                <h2>Add New Superhero</h2>
+                <form class="form-horizontal" role="form" id="addForm">
                     <div class="form-group row">
-                        <label for="addDate" class="col-md-4 control-label">
-                            Date:
+                        <label for="addName" class="col-md-4 control-label">
+                            Name:
                         </label>
             
                         <div class="col-md-8">
-                            <input type="date" 
-                                    class="form-control"
-                                    id="addDate"
-                                    placeholder="Date" 
-                                    required>
+                            <input type="text" 
+                                   class="form-control"
+                                   id="addName"
+                                   placeholder="Name" 
+                                   required>
                         </div>
                     </div>
                     <div class="form-group row"> 
-                        <label for="addSuperhero" class="col-md-4 control-label">
-                            Superhero:
+                        <label for="addDescription" class="col-md-4 control-label">
+                            Description:
                         </label>
-                        <select id="selectSuperheroAdd" class="select" required style="width:60%">
-                        </select>
-
+                
+                        <div class="col-md-8">
+                            <input type="text" 
+                                   class="form-control"
+                                   id="addDescription"
+                                   placeholder="Description">
+                        </div>
                     </div>
                     <div class="form-group row"> 
-                        <label for="addLocation" class="col-md-4 control-label">
-                            Location:
+                        <label for="addSuperpower" class="col-md-4 control-label">
+                            Superpower:
                         </label>
-                        <select id="selectLocationAdd" class="select" required style="width:60%">
+                        <select id="selectSuperpowerAdd" class="select" required style="width:60%">
                         </select>
                     </div>
+
                     <div class="form-group row">
                         <div class="offset-md-4 col-md-8">
                             <button type="button"
                                     id="addButton"
                                     class="btn btn-primary">
-                                Create Sighting
+                                Create Superhero
                             </button>
                         </div>
                     </div>
+
                 </form>
             </div> 
         </div>
+
+
+
     </div>
 
 
@@ -174,7 +185,7 @@
     <!-- JS & CSS library of MultiSelect plugin -->
  
     <!-- custom js files -->
-    <script src="js/sightings.js"></script>
+    <script src="js/superheros.js"></script>
 
     </body>
 </html>
