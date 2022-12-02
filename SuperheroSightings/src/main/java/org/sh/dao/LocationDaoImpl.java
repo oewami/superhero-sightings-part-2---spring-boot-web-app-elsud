@@ -19,25 +19,11 @@ import java.util.Map;
 @Profile("prod")
 public class LocationDaoImpl implements LocationDao {
 
-    /**
-     * 	id INT AUTO_INCREMENT PRIMARY KEY,
-     * 	name VARCHAR(40) NOT NULL,
-     *     description VARCHAR(160),
-     *     address VARCHAR(80) NOT NULL,
-     *     longitude VARCHAR(10) NOT NULL,
-     *     latitude VARCHAR(10) NOT NULL,
-     *     CONSTRAINT UNIQUE (longitude, latitude)
-     */
     private Map<Integer, Location> locations = new HashMap<>();
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    /**
-     *
-     * @param locationId
-     * @return
-     */
     @Override
     public Location getLocation(int locationId) {
         final String SELECT_LOCATION = "SELECT * FROM location WHERE id = ?;";
@@ -56,9 +42,15 @@ public class LocationDaoImpl implements LocationDao {
 
     @Override
     public boolean editLocation(Location location) {
-        final String UPDATE_LOCATION = "UPDATE location SET name = ? WHERE id = ?;";
+        final String UPDATE_LOCATION = "UPDATE location SET name = ?, description = ?, address = ?, longitude = ?, latitude = ? WHERE id = ?;";
         try {
-            return jdbcTemplate.update(UPDATE_LOCATION, location.getName(), location.getId()) > 0;
+            return jdbcTemplate.update(
+                    UPDATE_LOCATION, location.getName(),
+                    location.getDescription(),
+                    location.getAddress(),
+                    location.getLongitude(),
+                    location.getLatitude(),
+                    location.getId()) >0;
         } catch (DataAccessException e) {
             System.out.println("Invalid location");
         }
