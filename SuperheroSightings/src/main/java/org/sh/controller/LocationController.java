@@ -42,7 +42,6 @@ public class LocationController {
 
     @PostMapping("")
     public Location addLocation(@RequestBody Location location) {
-        System.out.println(location.getName());
         return locationDao.addLocation(location);
     }
 
@@ -62,7 +61,4 @@ public class LocationController {
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
-
-
-
 }
