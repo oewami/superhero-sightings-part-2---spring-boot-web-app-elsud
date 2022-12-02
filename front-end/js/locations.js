@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    clearLocationTable();
     loadLocations();
     addLocation();
     updateLocation();
@@ -12,7 +13,6 @@ function loadLocations() {
         type: 'GET',
         url: 'http://localhost:9090/api/location',
         success: function(locationArray) {
-        console.log(locationArray);
             $.each(locationArray, function(index, location){
                 var locationId = location.id;
                 var name = location.name;
@@ -158,7 +158,6 @@ function updateLocation() {
             'dataType': 'json',
             'success': function() {
                 $('#errorMessage').empty();
-                clearLocationTable();
                 loadLocations();
                 hideEditForm();
 
